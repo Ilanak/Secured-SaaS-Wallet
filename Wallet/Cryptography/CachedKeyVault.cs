@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 using Wallet.Communication;
 using StackExchange.Redis;
 using Microsoft.Azure.KeyVault.Models;
+using System.Diagnostics;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace Wallet.Cryptography
 {
@@ -19,6 +22,7 @@ namespace Wallet.Cryptography
         private string m_connectionString;
         private ICryptoActions m_cryptoActions;
         private ISecretsStore m_keyVault;
+        private TelemetryClient m_telemetryClient;
 
         #endregion
         
@@ -29,7 +33,8 @@ namespace Wallet.Cryptography
 
             m_keyVault = keyVault ?? throw new ArgumentNullException(nameof(keyVault)); ;
             m_cryptoActions = cryptoActions ?? throw new ArgumentNullException(nameof(cryptoActions));
-        }
+            m_telemetryClient = new TelemetryClient();
+    }
 
         public void Initialize()
         {
@@ -55,7 +60,7 @@ namespace Wallet.Cryptography
             ThrowIfNotInitialized();
 
             // The encryptedSecret will be saved ENCRYPTED.
-            var encryptedSecret = Utils.FromByteArray<string>(m_cryptoActions.Encrypt(Utils.ToByteArray(privateKey)));
+            var encryptedSecret = Wallet.Communication.Utils.FromByteArray<string>(m_cryptoActions.Encrypt(Wallet.Communication.Utils.ToByteArray(privateKey)));
             
             // stored UNEncrypted in keyvault, as keyvault is already safe
             // If a previous encryptedSecret exists, it will be overwritten
@@ -75,7 +80,9 @@ namespace Wallet.Cryptography
         /// <returns>The secret from the data base</returns>
         public async Task<string> GetSecretAsync(string identifier)
         {
+
             ThrowIfNotInitialized();
+            var sw = Stopwatch.StartNew();
 
             var rawValue = await m_db.StringGetAsync(identifier);
 
@@ -90,18 +97,29 @@ namespace Wallet.Cryptography
                 }
                 catch (KeyVaultErrorException exc)
                 {
+                    m_telemetryClient.TrackException(exc);
                     throw new SecureCommunicationException($"key: '{identifier}' was not found in KV", exc);
+                }catch(Exception exc)
+                {
+                    var s = exc.Message;
                 }
 
                 // Store in Redis (in Encrypted way)
-                await m_db.StringSetAsync(
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                m_db.StringSetAsync(
                     identifier, 
-                    m_cryptoActions.Encrypt(Utils.ToByteArray(secret)));
+                    m_cryptoActions.Encrypt(Wallet.Communication.Utils.ToByteArray(secret)));
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
+                sw.Stop();
+                m_telemetryClient.TrackMetric(new MetricTelemetry("KV-Get-4", sw.ElapsedMilliseconds));
+                // track
                 return secret;
             }
 
-            return Utils.FromByteArray<string>(m_cryptoActions.Decrypt(Utils.ToByteArray(rawValue)));
+            sw.Stop();
+            m_telemetryClient.TrackMetric(new MetricTelemetry("Redisd-Get-4", sw.ElapsedMilliseconds));
+            return Wallet.Communication.Utils.FromByteArray<string>(m_cryptoActions.Decrypt(rawValue));
         }
 
         #region privateMethods

@@ -2,7 +2,10 @@
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using Org.BouncyCastle.Security;
 using Wallet.Communication;
 
@@ -12,6 +15,7 @@ namespace Wallet.Cryptography
     {
         private SqlConnectionStringBuilder m_sqlConnectionStringBuilder;
         private bool m_isInitialized;
+        private TelemetryClient m_telemetryClient;
 
         // SQL queries
         private const string CreateAccountsTableQuery = @"
@@ -56,6 +60,8 @@ namespace Wallet.Cryptography
                 ApplicationIntent = ApplicationIntent.ReadWrite,
                 MultiSubnetFailover = false
             };
+
+            m_telemetryClient = new TelemetryClient();
         }
 
         public async Task Initialize()
@@ -109,6 +115,7 @@ namespace Wallet.Cryptography
         public async Task<string> GetSecretAsync(string identifier)
         {
             ThrowIfNotInitialized();
+            var sw = Stopwatch.StartNew();
 
             identifier = identifier.Replace("'", "''");
 
@@ -126,12 +133,17 @@ namespace Wallet.Cryptography
                         {
                             await reader.ReadAsync();
                             var result = reader.GetString(reader.GetOrdinal("PrivateKey"));
+                            sw.Stop();
+
+                            m_telemetryClient.TrackMetric(new MetricTelemetry("SqlGet-1", sw.ElapsedMilliseconds));
+
                             return result.Replace("''", "'");
                         }
                     }
                 }
                 catch (DbException ex)
                 {
+                    m_telemetryClient.TrackException(ex);
                     Console.WriteLine(ex.Message);
                     throw;
                 }

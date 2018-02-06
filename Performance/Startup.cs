@@ -28,7 +28,38 @@ namespace Performance
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddSingleton<KeyVault>((sp) =>
+            {
+                return new KeyVault(Configuration["AzureKeyVaultUri"],
+                                    Configuration["applicationId"], Configuration["applicationSecret"]);
+            });
+            services.AddSingleton((sp) => {
+                var encryptionKeyName = Configuration["EncryptionKeyName"];
+                var decryptionKeyName = Configuration["DecryptionKeyName"];
+                var signKeyName = Configuration["SignKeyName"];
+                var verifyKeyName = Configuration["VerifyKeyName"];
 
+                var ca = new KeyVaultCryptoActions(encryptionKeyName, decryptionKeyName, signKeyName, verifyKeyName, KV, KV);
+                ca.Initialize().Wait();
+                return ca;
+            }
+           
+            );
+            services.AddSingleton((sp) =>
+            {
+                var kv = new KeyVault(Configuration["AzureKeyVaultUri"],
+                                    Configuration["applicationId"], Configuration["applicationSecret"]);
+                var encryptionKeyName = Configuration["EncryptionKeyName"];
+                var decryptionKeyName = Configuration["DecryptionKeyName"];
+                var signKeyName = Configuration["SignKeyName"];
+                var verifyKeyName = Configuration["VerifyKeyName"];
+
+                var ca =  new KeyVaultCryptoActions(encryptionKeyName, decryptionKeyName, signKeyName, verifyKeyName, KV, KV);
+                ca.Initialize().Wait();
+                var red=  new CachedKeyVault(Configuration["CacheConnection"], kv, ca);
+                red.Initialize();
+                return red;
+            });
             services.AddSingleton<IQueue, AzureQueue>((serviceProvider) =>
             {
                 const string queueName = "somequeue";
@@ -47,6 +78,13 @@ namespace Performance
                 securedComm.Initialize().Wait();
 
                 return securedComm;
+            });
+
+            services.AddSingleton((sp) => {
+                 var sqlDb = 
+                new SqlConnector(Configuration["SqlUserID"], Configuration["SqlPassword"], Configuration["SqlInitialCatalog"], Configuration["SqlDataSource"]);
+                sqlDb.Initialize().Wait();
+                return sqlDb;
             });
         }
 
