@@ -1,6 +1,21 @@
 # This script logs in to Azure, creates certificate locally, 
 # uploads it to Azure KeyVault as a secret
 
+ function Upload-Certificate {
+  Param ([string] $certFilePath, [string] $filePassword, [string] $keyvaultName, [string] $applicationId, [string] $secretName)
+ 
+$flag = [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
+$collection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
+$collection.Import($certFilePath, $filePassword, $flag)
+$pkcs12ContentType = [System.Security.Cryptography.X509Certificates.X509ContentType]::Pkcs12
+$clearBytes = $collection.Export($pkcs12ContentType)
+$fileContentEncoded = [System.Convert]::ToBase64String($clearBytes)
+$secret = ConvertTo-SecureString -String $fileContentEncoded -Force -AsPlainText
+$secretContentType = 'application/x-pkcs12'
+Set-AzureRmKeyVaultAccessPolicy -VaultName $keyvaultName -ServicePrincipalName $applicationId -PermissionsToSecrets set,delete,get,list
+Set-AzureKeyVaultSecret -VaultName $keyvaultName -Name $secretName -SecretValue $Secret -ContentType $secretContentType
+ }
+
 # Parameters
 
 # The Azure tenant id (under active directory properties -> directory Id)
@@ -12,6 +27,10 @@ $applicationSecret = "[Azure application key]"
 
 # The Azure KeyVault Name
 $keyvaultName = '[The vault name]'
+
+# The Azure Keyvault who holds the public keys only
+$globalKeyvaultName = '[The vault name]'
+
 # The Azure KeyVault secret name
 $secretName = '[The keyvault secret name example: encryptionCert]'
 
@@ -30,22 +49,21 @@ Add-AzureRmAccount -Credential $cred -Tenant $tenantId -ServicePrincipal
 
 # Creates the certificate
 $pfxFilePath = $certTempDirectory + $secretName + '.pfx'
+$cerFilePath = $certTempDirectory + $secretName + '.cer'
 $cert = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $dnsName
 $pwd = ConvertTo-SecureString -String $plainpass -Force -AsPlainText
 $path = 'cert:\localMachine\my\' + $cert.thumbprint 
+# With private portion
 Export-PfxCertificate -cert $path -FilePath $pfxFilePath -Password $pwd
+# With public portion
+Export-Certificate -cert $path -FilePath $cerFilePath
 
 # Store the certificate in the AzureKeyVault
-$flag = [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
-$collection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
-$collection.Import($pfxFilePath, $plainpass, $flag)
-$pkcs12ContentType = [System.Security.Cryptography.X509Certificates.X509ContentType]::Pkcs12
-$clearBytes = $collection.Export($pkcs12ContentType, $plainpass)
-$fileContentEncoded = [System.Convert]::ToBase64String($clearBytes)
-$secret = ConvertTo-SecureString -String $fileContentEncoded -Force -AsPlainText
-$secretContentType = 'application/x-pkcs12'
-Set-AzureRmKeyVaultAccessPolicy -VaultName $keyvaultName -ServicePrincipalName $applicationId -PermissionsToSecrets set,delete,get,list
-Set-AzureKeyVaultSecret -VaultName $keyvaultName -Name $secretName -SecretValue $Secret -ContentType $secretContentType
-
-# Delete local Certificate 
+Upload-Certificate -certFilePath $pfxFilePath -filePassword $plainpass -keyvaultName $keyvaultName -applicationId $applicationId -secretName $secretName
+# Delete local PFX Certificate file 
 Remove-Item -path $pfxFilePath
+
+# Uncomment the following lines in order to upload the public key to a special global key vault:
+# Upload-Certificate -certFilePath $cerFilePath -filePassword "" -keyvaultName $globalKeyvaultName -applicationId $applicationId -secretName $secretName
+## Delete local CER Certificate file 
+# Remove-Item -path $cerFilePath
