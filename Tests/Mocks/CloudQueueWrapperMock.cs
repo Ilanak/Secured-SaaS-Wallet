@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
-using Wallet.Communication.AzureQueueDependencies;
+using Communication.AzureQueueDependencies;
 
 namespace UnitTests.Mocks
 {

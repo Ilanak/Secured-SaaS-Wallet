@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Wallet.Cryptography;
+using Cryptography;
 
 namespace UnitTests
 {

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Configuration;
 using System.Threading;
-using Wallet.Blockchain;
-using Wallet.Communication;
-using Wallet.Communication.AzureQueueDependencies;
-using Wallet.Cryptography;
-using static Wallet.Cryptography.KeyVaultCryptoActions;
+using Blockchain;
+using Communication;
+using Communication.AzureQueueDependencies;
+using Cryptography;
+using static Cryptography.KeyVaultCryptoActions;
 
 namespace CoinsReceiver
 {
@@ -73,7 +73,7 @@ namespace CoinsReceiver
                 securedComm.DequeueAsync(
                     msg =>
                     {
-                       var data = Utils.FromByteArray<string>(msg);
+                       var data = Communication.Utils.FromByteArray<string>(msg);
                         if (data.Equals(reciverAddress, StringComparison.OrdinalIgnoreCase))
                         {
                             Console.WriteLine("Great, Balance change!");

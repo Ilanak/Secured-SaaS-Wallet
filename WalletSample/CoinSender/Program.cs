@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Configuration;
 using System.Threading;
-using Wallet.Blockchain;
-using Wallet.Communication;
-using Wallet.Communication.AzureQueueDependencies;
-using Wallet.Cryptography;
-using static Wallet.Cryptography.KeyVaultCryptoActions;
+using Blockchain;
+using Communication;
+using Communication.AzureQueueDependencies;
+using Cryptography;
+using static Cryptography.KeyVaultCryptoActions;
 
 namespace CoinsSender
 {
@@ -143,7 +143,7 @@ namespace CoinsSender
                 var amountToSend = 0.001;
                 // Message structure: {amountToSend};{senderName};{reciverAddress}
                 var message = $"{amountToSend};{c_senderId};{reciverAddress}";
-                securedComm.EnqueueAsync(Utils.ToByteArray(message)).Wait();
+                securedComm.EnqueueAsync(Communication.Utils.ToByteArray(message)).Wait();
 
                 // Sleep 1 minute
                 Thread.Sleep(60000);

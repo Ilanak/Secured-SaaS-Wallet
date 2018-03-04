@@ -1,6 +1,6 @@
 using Xunit;
 using System.Configuration;
-using Wallet.Cryptography;
+using Cryptography;
 
 namespace UnitTests
 {

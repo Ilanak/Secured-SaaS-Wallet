@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Wallet.Blockchain;
+using Blockchain;
 using Xunit;
 
 namespace UnitTests

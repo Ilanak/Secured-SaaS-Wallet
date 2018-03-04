@@ -2,11 +2,11 @@
 using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
-using Wallet.Blockchain;
-using Wallet.Communication;
-using Wallet.Communication.AzureQueueDependencies;
-using Wallet.Cryptography;
-using static Wallet.Cryptography.KeyVaultCryptoActions;
+using Blockchain;
+using Communication;
+using Communication.AzureQueueDependencies;
+using Cryptography;
+using static Cryptography.KeyVaultCryptoActions;
 
 namespace TransactionEngine
 {
@@ -73,7 +73,7 @@ namespace TransactionEngine
                 {
                     Console.WriteLine("Got work!");
 
-                    var data = Utils.FromByteArray<string>(msg);
+                    var data = Communication.Utils.FromByteArray<string>(msg);
                     var msgArray = data.Split(';');
                     var amount = unitConverion.ToWei(msgArray[0]);
                     var senderName = msgArray[1];
@@ -95,7 +95,7 @@ namespace TransactionEngine
                     Thread.Sleep(3000);
 
                     // notify a user about his balance change
-                    securedCommForNotifications.EnqueueAsync(Utils.ToByteArray(reciverAddress)).Wait();
+                    securedCommForNotifications.EnqueueAsync(Communication.Utils.ToByteArray(reciverAddress)).Wait();
                 },
                 (message) => { Console.WriteLine("Verification failure, doing nothing"); },
                 TimeSpan.FromSeconds(3)).Wait();

@@ -1,5 +1,5 @@
 ﻿using System;
-using Wallet.Communication;
+using Communication;
 using Xunit;
 
 namespace UnitTests

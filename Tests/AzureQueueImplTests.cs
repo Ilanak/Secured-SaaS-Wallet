@@ -5,9 +5,9 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 using UnitTests.Mocks;
 using Xunit;
-using Wallet.Communication;
-using Wallet.Cryptography;
-using static Wallet.Cryptography.KeyVaultCryptoActions;
+using Communication;
+using Cryptography;
+using static Cryptography.KeyVaultCryptoActions;
 
 namespace UnitTests
 {
@@ -21,7 +21,7 @@ namespace UnitTests
 
             try
             {
-                await azureQueue.EnqueueAsync(Utils.ToByteArray("some message"));
+                await azureQueue.EnqueueAsync(Communication.Utils.ToByteArray("some message"));
             }
             catch (SecureCommunicationException ex)
             {
@@ -50,14 +50,14 @@ namespace UnitTests
 
             // Enqueue message
             var msg = "new message";
-            await azureQueue.EnqueueAsync(Utils.ToByteArray(msg));
+            await azureQueue.EnqueueAsync(Communication.Utils.ToByteArray(msg));
 
             var queueRefernce = queueMock.GetQueueReference(queueName);
 
             var result = await queueRefernce.GetMessageAsync(TimeSpan.FromSeconds(10),
                 new QueueRequestOptions(), new OperationContext());
 
-            var encryptedMessage = Utils.FromByteArray<Message>(result.AsBytes);
+            var encryptedMessage = Communication.Utils.FromByteArray<Message>(result.AsBytes);
             // String is encrypted, check it value
             Assert.Equal(256, encryptedMessage.Data.Length);
         }
@@ -83,12 +83,12 @@ namespace UnitTests
 
             // Enqueue Message
             var msg = "new message";
-            await azureQueue.EnqueueAsync(Utils.ToByteArray(msg));
+            await azureQueue.EnqueueAsync(Communication.Utils.ToByteArray(msg));
 
             var task = azureQueue.DequeueAsync(decrypted =>
                 {
                     // Verify that the decrypted message equals to the original
-                    Assert.Equal(msg, Utils.FromByteArray<string>(decrypted));
+                    Assert.Equal(msg, Communication.Utils.FromByteArray<string>(decrypted));
                 }, (message) => { Console.WriteLine("Verification failure, doing nothing"); },
                 TimeSpan.FromMilliseconds(1));
 
