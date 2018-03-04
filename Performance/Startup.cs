@@ -51,7 +51,7 @@ namespace Performance
                     new CertificateInfo(verifyKeyName, verifyCertPassword),
                     KV,
                     KV);
-                secretsMgmnt.Initialize().Wait();
+                secretsMgmnt.InitializeAsync().Wait();
                 //var securedComm = new RabbitMQBusImpl(config["rabbitMqUri"], secretsMgmnt, true, "securedCommExchange");
                 var queueClient = new CloudQueueClientWrapper(Configuration["AzureStorageConnectionString"]);
                 securedComm = new AzureQueue(queueName, queueClient, secretsMgmnt, true);

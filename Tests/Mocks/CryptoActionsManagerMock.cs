@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Wallet.Cryptography;
 
 namespace UnitTests
@@ -8,6 +9,11 @@ namespace UnitTests
         public byte[] Decrypt(byte[] encryptedData)
         {
             throw new NotImplementedException();
+        }
+
+        public Task InitializeAsync()
+        {
+            return Task.CompletedTask;
         }
 
         public byte[] Encrypt(byte[] data)

@@ -1,4 +1,6 @@
-﻿namespace Wallet.Cryptography
+﻿using System.Threading.Tasks;
+
+namespace Wallet.Cryptography
 {
     /// <summary>
     /// Provides the interface for all of the cryptographic actions which we
@@ -6,6 +8,11 @@
     /// </summary>
     public interface ICryptoActions
     {
+        /// <summary>
+        /// InitializeAsync the object
+        /// </summary>
+        Task InitializeAsync();
+
         /// <summary>
         /// Encrypt the specified data.
         /// </summary>

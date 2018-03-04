@@ -7,8 +7,8 @@
     <ProjectGuid>{08D935CF-2FB4-45D5-A80D-1F9208C9A9CF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Wallet2</RootNamespace>
-    <AssemblyName>Wallet2</AssemblyName>
+    <RootNamespace>Wallet</RootNamespace>
+    <AssemblyName>Wallet</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -34,13 +34,13 @@
       <HintPath>..\packages\BouncyCastle.1.8.1\lib\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Azure.KeyVault, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Azure.KeyVault.2.4.0-preview\lib\net452\Microsoft.Azure.KeyVault.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Azure.KeyVault.2.3.2\lib\net452\Microsoft.Azure.KeyVault.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Azure.KeyVault.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Azure.KeyVault.Core.1.0.0\lib\net40\Microsoft.Azure.KeyVault.Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Azure.KeyVault.WebKey, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Azure.KeyVault.WebKey.2.1.0-preview\lib\net452\Microsoft.Azure.KeyVault.WebKey.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Azure.KeyVault.WebKey.2.0.7\lib\net452\Microsoft.Azure.KeyVault.WebKey.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Diagnostics.Tracing.EventSource, Version=1.1.28.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Diagnostics.Tracing.EventSource.Redist.1.1.28\lib\net46\Microsoft.Diagnostics.Tracing.EventSource.dll</HintPath>
@@ -165,7 +165,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

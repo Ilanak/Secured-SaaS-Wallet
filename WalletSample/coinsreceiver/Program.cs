@@ -61,7 +61,7 @@ namespace CoinsReceiver
                     kv,
                     kv);
 
-            secretsMgmnt.Initialize().Wait();
+            secretsMgmnt.InitializeAsync().Wait();
             //var securedComm = new RabbitMQBusImpl(ConfigurationManager.AppSettings["rabbitMqUri"], secretsMgmnt, true, "securedCommExchange");
             var queueClient =
                 new CloudQueueClientWrapper(ConfigurationManager.AppSettings["AzureStorageConnectionString"]);

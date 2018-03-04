@@ -42,7 +42,7 @@ namespace UnitTests
                 new CertificateInfo("emc", string.Empty),
                 keyVaultMock,
                 keyVaultMock);
-            await encryptionManager.Initialize();
+            await encryptionManager.InitializeAsync();
 
             var queueName = "queueName";
             var azureQueue = new AzureQueue(queueName, queueMock, encryptionManager, true);
@@ -75,7 +75,7 @@ namespace UnitTests
                 new CertificateInfo("emc", string.Empty),
                 keyVaultMock,
                 keyVaultMock);
-            await encryptionManager.Initialize();
+            await encryptionManager.InitializeAsync();
 
             var queueName = "queueName";
             var azureQueue = new AzureQueue(queueName, queueMock, encryptionManager, true);

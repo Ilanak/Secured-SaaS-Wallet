@@ -23,7 +23,7 @@ namespace UnitTests
                 new CertificateInfo(c_verifyKeyName, string.Empty),
                 kvInfo,
                 kvInfo);
-            secretsMgmnt.Initialize().Wait();
+            secretsMgmnt.InitializeAsync().Wait();
         }
 
         [Fact]
@@ -39,7 +39,7 @@ namespace UnitTests
                 new CertificateInfo(c_verifyKeyName, string.Empty),
                 kvInfo,
                 kvInfo);
-            await secretsMgmnt.Initialize();
+            await secretsMgmnt.InitializeAsync();
 
             var encryptedData = secretsMgmnt.Encrypt(Utils.ToByteArray(rawData));
 
@@ -60,7 +60,7 @@ namespace UnitTests
                 new CertificateInfo(c_verifyKeyName, string.Empty),
                 kvInfo,
                 kvInfo);
-            await secretsMgmnt.Initialize();
+            await secretsMgmnt.InitializeAsync();
 
             // Encrypt
             var encryptedData = secretsMgmnt.Encrypt(Utils.ToByteArray(rawData));
@@ -87,7 +87,7 @@ namespace UnitTests
                 new CertificateInfo(c_verifyKeyName, string.Empty),
                 kvInfo,
                 kvInfo);
-            await secretsMgmnt.Initialize();
+            await secretsMgmnt.InitializeAsync();
 
             // Sign the data
             var signature = secretsMgmnt.Sign(Utils.ToByteArray(rawData));
@@ -108,7 +108,7 @@ namespace UnitTests
                 new CertificateInfo(c_verifyKeyName, string.Empty),
                 kvInfo,
                 kvInfo);
-            await secretsMgmnt.Initialize();
+            await secretsMgmnt.InitializeAsync();
 
             // Sign the data
             var signature = secretsMgmnt.Sign(Utils.ToByteArray(rawData));

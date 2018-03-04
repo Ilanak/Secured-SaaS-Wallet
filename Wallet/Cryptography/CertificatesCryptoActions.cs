@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 
 namespace Wallet.Cryptography
 {
@@ -50,6 +51,11 @@ namespace Wallet.Cryptography
                 Console.WriteLine($"Exception was thrown while decrypting the data: {exc}");
                 throw;
             }
+        }
+
+        public Task InitializeAsync()
+        {
+            return Task.CompletedTask;
         }
 
         /// <summary>

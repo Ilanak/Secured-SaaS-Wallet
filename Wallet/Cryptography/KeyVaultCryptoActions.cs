@@ -71,9 +71,9 @@ namespace Wallet.Cryptography
         }
 
         /// <summary>
-        /// Initialize the <see cref="CertificatesCryptoActions"/> object with all the certificates taken from the keyvaults
+        /// InitializeAsync the <see cref="CertificatesCryptoActions"/> object with all the certificates taken from the keyvaults
         /// </summary>
-        public async Task Initialize()
+        public async Task InitializeAsync()
         {
             // TODO: handle partial assignment of values
             var encryptSecretTask = m_publicKeyVault.GetSecretAsync(m_encryptionCertInfo.Name);
@@ -197,7 +197,7 @@ namespace Wallet.Cryptography
         {
             if (!m_isInit)
             {
-                throw new CryptoException("Initialize method needs to be called before accessing class methods");
+                throw new CryptoException("InitializeAsync method needs to be called before accessing class methods");
             }
         }
 
