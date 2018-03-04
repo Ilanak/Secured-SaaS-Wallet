@@ -4,16 +4,16 @@
  function Upload-Certificate {
   Param ([string] $certFilePath, [string] $filePassword, [string] $keyvaultName, [string] $applicationId, [string] $secretName)
  
-$flag = [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
-$collection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
-$collection.Import($certFilePath, $filePassword, $flag)
-$pkcs12ContentType = [System.Security.Cryptography.X509Certificates.X509ContentType]::Pkcs12
-$clearBytes = $collection.Export($pkcs12ContentType)
-$fileContentEncoded = [System.Convert]::ToBase64String($clearBytes)
-$secret = ConvertTo-SecureString -String $fileContentEncoded -Force -AsPlainText
-$secretContentType = 'application/x-pkcs12'
-Set-AzureRmKeyVaultAccessPolicy -VaultName $keyvaultName -ServicePrincipalName $applicationId -PermissionsToSecrets set,delete,get,list
-Set-AzureKeyVaultSecret -VaultName $keyvaultName -Name $secretName -SecretValue $Secret -ContentType $secretContentType
+  $flag = [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
+  $collection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
+  $collection.Import($certFilePath, $filePassword, $flag)
+  $pkcs12ContentType = [System.Security.Cryptography.X509Certificates.X509ContentType]::Pkcs12
+  $clearBytes = $collection.Export($pkcs12ContentType)
+  $fileContentEncoded = [System.Convert]::ToBase64String($clearBytes)
+  $secret = ConvertTo-SecureString -String $fileContentEncoded -Force -AsPlainText
+  $secretContentType = 'application/x-pkcs12'
+  Set-AzureRmKeyVaultAccessPolicy -VaultName $keyvaultName -ServicePrincipalName $applicationId -PermissionsToSecrets set,delete,get,list
+  Set-AzureKeyVaultSecret -VaultName $keyvaultName -Name $secretName -SecretValue $Secret -ContentType $secretContentType
  }
 
 # Parameters
